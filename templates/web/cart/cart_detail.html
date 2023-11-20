@@ -1,0 +1,380 @@
+{% load static %}
+
+{% block content %}
+{% load cart_tag %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--=============== FLAT ICON ===============-->
+    <link
+    rel="stylesheet"
+    href="https://cdn-uicons.flaticon.com/2.0.0/uicons-regular-straight/css/uicons-regular-straight.css"
+    />
+
+    <!--=============== SWIPER CSS ===============-->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="{% static "web/css/styles.css" %}" />
+
+    <title>E-commerce Website</title>
+  </head>
+  <body>
+    <!--=============== HEADER ===============-->
+    <header class="header">
+      <div class="header__top">
+        <div class="header__container container">
+          <div class="header__contact">
+            <span>(+34)-9456-7234</span>
+
+            <span>Our location</span>
+          </div>
+
+          <p class="header__alert-news">
+            Super Value Deals - Save more with coupons
+          </p>
+
+          <a href="{% url "login" %}" class="header__top-action">
+            Login / Register
+          </a>
+        </div>
+      </div>
+
+      <!-- NavBar -->
+      <nav class="nav container">
+        <a href="index.html" class="nav__log">
+          <img src="{% static "web/images/logo.svg" %}" alt="" class="nav__log-img" />
+        </a>
+
+        <div class="nav__menu" id="nav-menu">
+          <ul class="nav__list">
+            <li class="nav__item">
+              <a href="{% url "index" %}" class="nav__link">Home</a>
+            </li>
+            <li class="nav__item">
+              <a href="{% url "shop" %}" class="nav__link">Shop</a>
+            </li>
+            <li class="nav__item">
+              <a href="{% url "accounts" %}" class="nav__link">My Account</a>
+            </li>
+            <li class="nav__item">
+              <a href="{% url "compare" %}" class="nav__link">Compare</a>
+            </li>
+            <li class="nav__item">
+              {% if user.is_authenticated %}
+              <a href="{% url "log" %}" class="nav__link">Logout</a>
+
+              {% else %}
+              <a href="{% url "login" %}" class="nav__link">Login</a>
+              {% endif %}
+            </li>
+          </ul>
+
+          <div class="header__search">
+            <input
+              type="text"
+              placeholder="Search for items"
+              class="form__input"
+            />
+
+            <button class="search__btn">
+              <img src="{% static "web/images/search.png" %}" alt="" width="25px" />
+            </button>
+          </div>
+        </div>
+
+        <div class="header__user-actions">
+          <a href="{% url "wishlist" %}" class="header__action-btn">
+            <img src="{% static "web/images/icon-heart.svg" %}" alt="" />
+            <span class="count">{{request.session.cart|length}}</span>
+          </a>
+          <a href="{% url "cart_detail" %}" class="header__action-btn active-link">
+            <img src="{% static "web/images/icon-cart.svg" %}" alt="" />
+            <span class="count">{{request.session.cart|length}}</span>
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <!--=============== MAIN ===============-->
+    <main class="main">
+      <!--=============== BREADCRUMB ===============-->
+      <section class="breadcrumb"> 
+        <ul class="breadcrumb__list flex container">
+          <li><a href="{% url "index" %}" class="breadcrumb__link">Home</a></li>
+          <li><span class="breadcrumb__link">></span></li>
+          <li><span class="breadcrumb__link">Shop</span>
+          <li><span class="breadcrumb__link">></span>
+          <li><span class="breadcrumb__link">Cart</span>
+          
+        </ul>
+      </section>
+
+      <!--=============== CART ===============-->
+      <section class="cart section--lg container">
+        <div class="table__container">
+          <table class="table">
+            <tr>
+              <th>Images</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Subtotal</th>
+              <th>Remove</th>
+            </tr>
+            {% for key,value in request.session.cart.items %}
+            <tr>
+              
+              <td>
+                <img src="{{value.image}} " alt="" class="table__img">
+              </td>
+              <td>
+                <h6 class="table__title">{{value.name}}</h6>
+                {% comment %} <h6 class="table__title">J.Crew Mercantile Women's Short-Sleeve</h6> {% endcomment %}
+                {% comment %} <p class="table__description">Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p> {% endcomment %}
+              </td>
+              <td>
+                <span class="table__price">${{value.price}}</span>
+              </td>
+              <td>
+                <a href="{% url 'item_increment' value.product_id %}" class="math">+</a>
+                <input type="number" min="1" max="99" name="quantity" id="qty" class
+                ="quantity" value="{{value.quantity}}"/>
+                <a href="{% url 'item_decrement' value.product_id %}" class="math">-</a>
+              </td>
+              <td>
+                <span class="table__subtotal">
+                  ${{ value.price|multiply:value.quantity }}
+                </span>
+              </td>
+              <td>
+                <a href="{% url 'item_clear' key %}"><i class="fi fi-rs-trash table__trash"></i></a>
+              </td>
+              
+            </tr>
+            {% endfor %}
+            {% comment %} <tr>
+              <td>
+                <img src="{% static "web/images/product-7-1.jpg" %}" alt="" class="table__img">
+              </td>
+              <td>
+                <h6 class="table__title">J.Crew Mercantile Women's Short-Sleeve</h6>
+                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
+              </td>
+              <td>
+                <span class="table__price">$120</span>
+              </td>
+              <td>
+                <a href="" class="math">+</a>
+                <input type="number" min="1" max="99" value="1" name="quantity" id="qty" class
+                ="quantity"/>
+                <a href="" class="math">-</a>
+              </td>
+              <td>
+                <span class="table__subtotal">
+                  $120
+                </span>
+              </td>
+              <td>
+                <i class="fi fi-rs-trash table__trash"></i>
+              </td>
+            </tr> {% endcomment %}
+          </table>
+        </div>
+
+        <div class="cart__actions">
+          <a href="#" class="btn flex btn--md">
+            <i class="fi-rs-shuffle"></i> Update Cart
+          </a>
+
+          <a href="{% url "shop" %}" class="btn flex btn--md">
+            <i class="fi-rs-shopping-bag"></i> Continue Shopping
+          </a>
+        </div>
+        
+        <div class="divider">
+          <i class="fi fi-rs-fingerprint"></i>
+        </div>
+
+        <div class="cart__group grid">
+          <div>
+            <div class="cart__shipping">
+              <h3 class="section__title">Calculate Shipping</h3>
+
+              <form action="" class="form grid">
+                <input type="text" placeholder="State / Country" class="form__input">
+
+                <div class="form__group grid">
+                  <input type="text" placeholder="City" class="form__input">
+
+                  <input type="text" placeholder="PostCode / ZipCode" class="form__input">
+                </div>
+
+                <div class="form__btn">
+                  <button class="btn flex btn--sm">
+                    <i class="fi-rs-shuffle"></i> Update
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <div class="cart__coupon">
+              <h3 class="section__title">Apply Coupon</h3>
+
+              <form action="" class="coupon__form form grid">
+                <div class="form__group grid">
+                  <input type="text" placeholder="Coupon Code" class="form__input">
+
+                  <div class="form__btn">
+                    <button class="btn flex btn--sm">
+                      <i class="fi-rs-label"></i> Apply
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="cart__total">
+            <h3 class="section__title">Cart Totals</h3>
+
+            <table class="cart__total-table">
+              <tr>
+                <td><span class="cart__total-title"> Cart Subtotal</span></td>
+                <td><span class="cart__total-price"> ${{cart_total_amount}}</span></td>
+              </tr>
+              <tr>
+                <td><span class="cart__total-title">Shipping</span></td>
+                <td><span class="cart__total-price">$10.00</span></td>
+                </tr>
+              <tr>
+                <td><span class="cart__total-title">Total</span></td>
+                <td><span class="cart__total-price">${{cart_total_amount|add:10}}</span></td>
+              </tr>
+            </table>
+
+            <a href="{% url "checkout" %}" class="btn flex btn--sm">
+              <i class="fi fi-rs-box-alt"></i> Proceed To Checkout
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!--=============== NEWSLETTER ===============-->
+      <section class="newsletter section home__newsletter">
+        <div class="newsletter__container container grid">
+          <h3 class="newsletter__title flex">
+            <img
+              src="{% static "web/images/icon-email.svg" %}"
+              alt=""
+              class="newsletter__icon"
+            />
+            Sign up for our newsletter!
+          </h3>
+          <p class="newsletter__text">
+            Get the latest updates and special offers.
+          </p>
+          <form action="#" method="post" class="newsletter__form">
+            <input
+              type="text"
+              placeholder="Enter your Email"
+              class="newsletter__input"
+            />
+            <button type="submit" class="newsletter__btn">Subscribe</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <!--=============== FOOTER ===============-->
+    <footer class="footer container">
+      <div class="footer__container grid">
+        <div class="footer__content">
+          <a href="index.html" class="footer__logo">
+            <img src="{% static "web/images/logo.svg" %}" alt="" class="footer__logo-img" />
+          </a>
+
+          <h4 class="footer__subtitle">Contact</h4>
+          <p class="footer__description">
+            <span>Address: </span> 562 Wellington Road, Street 32, San Francisco
+          </p>
+          <p class="footer__description">
+            <span>Phone: </span> +01 2222 365 / (+91) 01 2345 6789
+          </p>
+          <p class="footer__description">
+            <span>Hours: </span> 10:00 - 18:00, Mon - Sat
+          </p>
+
+          <div class="footer__social">
+            <h4 class="footer__subtitle">Follow Me </h4>
+
+            <div class="footer__social-links flex">
+              <a href="">
+                <img src="{% static "web/images/icon-facebook.svg" %}" alt="" class="footer__social-icon">
+              </a>
+              <a href="">
+                <img src="{% static "web/images/icon-instagram.svg" %}" alt="" class="footer__social-icon">
+              </a>
+              <a href="">
+                <img src="{% static "web/images/icon-pinterest.svg" %}" alt="" class="footer__social-icon">
+              </a>
+              <a href="">
+                <img src="{% static "web/images/icon-twitter.svg" %}" alt="" class="footer__social-icon">
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer__content">
+          <h4 class="footer__title">Address</h4>
+          <ul class="footer__links">
+            <li><a href="#" class="footer__link">About Us</a></li>
+            <li><a href="#" class="footer__link">Delivery Information</a></li>
+            <li><a href="#" class="footer__link">Privacy Policy</a></li>
+            <li><a href="#" class="footer__link">Terms & Conditions</a></li>
+            <li><a href="#" class="footer__link">Contact Us</a></li>
+            <li><a href="#" class="footer__link">Support Center</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__content">
+          <h4 class="footer__title">My Account</h4>
+          <ul class="footer__links">
+            <li><a href="#" class="footer__link">Sign In</a></li>
+            <li><a href="#" class="footer__link">View Cart</a></li>
+            <li><a href="#" class="footer__link">My wishlist</a></li>
+            <li><a href="#" class="footer__link">Help</a></li>
+            <li><a href="#" class="footer__link">Order</a></li>
+          </ul>
+        </div>
+
+        <div class="footer__content">
+          <h3 class="footer__title">Secured Payment Gateways</h3>
+
+          <img src="{% static "web/images/Paymentmethods/american-express.png" %}" alt="" class="payment__img" width="50px">
+          <img src="{% static "web/images/Paymentmethods/apple-pay.png" %}" alt="" class="payment__img" width="50px">
+          <img src="{% static "web/images/Paymentmethods/paypal.png" %}" alt="" class="payment__img" width="50px"> 
+          <img src="{% static "web/images/Paymentmethods/visa (1).png" %}" alt="" class="payment__img" width="50px">
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <span class="footer__copyright">© 2021, E-commerce Store. All rights reserved.</span>
+        
+      </div>
+    </footer>
+
+    <!--=============== SWIPER JS ===============-->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    <!--=============== MAIN JS ===============-->
+    <script src="{% static "web/js/main.js" %}"></script>
+  </body>
+</html>
+{% endblock %}
